@@ -1,7 +1,8 @@
 ﻿var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var port = process.env.port || 8080;
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
 var io = require('socket.io')(http);
 
 app.use(express.static(__dirname + '/public'));
@@ -47,6 +48,6 @@ io.on('connection', function (socket) {
 });
 
 // Start server
-http.listen(port, function () {
+http.listen(port, server_ip_address,  function () {
     console.log('Server listen on ' + port);
 });
