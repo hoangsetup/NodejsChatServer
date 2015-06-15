@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Socket IO!</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="jquery.js"></script>
+    <link href="bootstrap.min.css" rel="stylesheet" />
+    <style type="text/css">
+    </style>
+    <script type="text/javascript">
+        var socket = io();
+        var name = prompt('Enter you name!');
+        if (name != null) {
+            socket.emit('adduser', { username: name });
+            socket.on('listuser', function (data) {
+                var users = data['users'];
+                $('#listuser').html('');
+                for (u in users) {
+                    if(users[u] != socket.id)
+                        $('#listuser').append('<li id="' + users[u] + '" class=\"list-group-item list-group-item-success\">' + u + '</li>');
+                }
+            });
+
+            socket.on('message', function(data){
+                console.log('Data:' + data.username + ':'+ data.message);
+                $('#messages').append('<li><img src=\"/images/ic_coder.png\" class="img-responsive inline-block"/><label class=\"label label-danger\">'+data.username+'</label><p>'+data.msg+'</p></li>');
+            });
+
+            function sendMsg(e){
+                if (e.keyCode == 13) {
+                    $('#messages').append('<li><label class=\"label label-success\">Me</label><p>'+$('#msg').val()+'</p></li>');
+                    socket.emit('sendmessage', {msg: $('#msg').val()});
+                    $('#msg').val('');
+                    return false;
+                }
+            };
+        }
+    </script>
+</head>
+<body class="container-fluid">
+    <header>
+        <nav class="navbar navbar-dafault" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">
+                        EJS Is Fun
+                    </a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main class="container-fluid">
+        <div class="row">
+            <!--Chat conventions-->
+            <div class="col-md-8">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <p>Chat box</p>
+                    </div>
+                    <div class="panel-body" style="min-height: 120px">
+                        <ul id="messages" class="list-group" style="">
+<!--                             <li>
+                                <label class="label label-success">Hoàng Đinh  11:29:30</label>
+                                <p>This is message!</p>
+
+                            </li> -->
+                            
+                        </ul>
+                    </div>
+                    <div class="panel-footer">
+                        <form action="" class="bottom" onsubmit="return false;">
+                            <input id="msg" autocomplete="off" class="form-control" placeholder="Enter message..." onkeypress="return sendMsg(event)" />
+                            <!--<button>Send</button>-->
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--Room , online user-->
+            <div class="col-md-4">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <p>Online</p>
+                    </div>
+                    <div class="panel-body">
+                        <ul id="listuser" class="list-group"></ul>
+                    </div>
+                    <div class="panel-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p class="text-center text-muted">Copyright 2015 Hoangsetup</p>
+    </footer>
+</body>
+</html>
