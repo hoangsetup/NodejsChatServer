@@ -9,8 +9,11 @@
     <style type="text/css">
     </style>
     <script type="text/javascript">
-        var socket = io();
         var name = prompt('Enter you name!');
+        while(name === ''){
+            name = prompt('Enter you name!');
+        }
+        var socket = io();
         if (name != null) {
             socket.emit('adduser', { username: name });
             socket.on('listuser', function (data) {
@@ -25,6 +28,8 @@
             socket.on('message', function(data){
                 console.log('Data:' + data.username + ':'+ data.message);
                 $('#messages').append('<li><img src=\"/images/ic_coder.png\" class="img-responsive inline-block"/><label class=\"label label-danger\">'+data.username+'</label><p>'+data.msg+'</p></li>');
+
+                $(".chat-box").scrollTop($(".chat-box")[0].scrollHeight);
             });
 
             function sendMsg(e){
@@ -32,9 +37,25 @@
                     $('#messages').append('<li><label class=\"label label-success\">Me</label><p>'+$('#msg').val()+'</p></li>');
                     socket.emit('sendmessage', {msg: $('#msg').val()});
                     $('#msg').val('');
+
+                    $(".chat-box").scrollTop($(".chat-box")[0].scrollHeight);
+
                     return false;
                 }
             };
+
+            window.onbeforeunload = function(event) {
+                event = event || window.event;
+                var confirmClose = 'Are you sure?';
+                // For IE and Firefox prior to version 4
+                if (event) {
+                   event.returnValue = confirmClose;
+                }
+                // For Safari
+                //socket.emit('sendmessage', {msg: 'disconnect'});
+                socket.disconnect();
+                return confirmClose;
+            }
         }
     </script>
 </head>
@@ -62,7 +83,7 @@
                     <div class="panel-heading">
                         <p>Chat box</p>
                     </div>
-                    <div class="panel-body" style="min-height: 120px">
+                    <div class="panel-body chat-box" style="min-height: 250px; max-height: 250px; overflow-x: hidden;">
                         <ul id="messages" class="list-group" style="">
 <!--                             <li>
                                 <label class="label label-success">Hoàng Đinh  11:29:30</label>
@@ -86,8 +107,8 @@
                     <div class="panel-heading">
                         <p>Online</p>
                     </div>
-                    <div class="panel-body">
-                        <ul id="listuser" class="list-group"></ul>
+                    <div class="panel-body" style="min-height: 285px; max-height: 285px; overflow-x: hidden;">
+                        <ul id="listuser" class="list-group" style=""></ul>
                     </div>
                     <div class="panel-footer">
                     </div>
